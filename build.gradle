@@ -1,0 +1,51 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+    id 'com.jfrog.bintray' version '1.8.5'
+    id 'com.github.johnrengelman.shadow' version '5.1.0'
+}
+
+apply plugin: 'java'
+
+group 'x.samantha'
+version '0.1-SNAPSHOT'
+archivesBaseName = 'CommandsJDA'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation group: 'net.dv8tion', name: 'JDA', version: '4.2.0_218'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+
+    implementation group: 'org.apache.lucene', name: 'lucene-core', version: '8.7.0'
+    implementation group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.7.0'
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    pkg {
+        repo = 'discord'
+        name = 'CommandsJDA'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/x-Samantha/CommandsJDA.git'
+
+        version {
+            name = '0.1-SNAPSHOT'
+            desc = 'Pre-release CommandsJDA'
+            released = new Date()
+            vcsTag = '0.1-SNAPSHOT'
+        }
+    }
+    configurations = ['archives']
+}
