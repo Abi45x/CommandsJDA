@@ -2,12 +2,13 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.3.72'
     id 'com.jfrog.bintray' version '1.8.5'
     id 'com.github.johnrengelman.shadow' version '5.1.0'
+    id 'maven'
 }
 
 apply plugin: 'java'
 
 group 'x.samantha'
-version '0.1-SNAPSHOT'
+version '0.1.4'
 archivesBaseName = 'CommandsJDA'
 
 repositories {
@@ -41,11 +42,65 @@ bintray {
         vcsUrl = 'https://github.com/x-Samantha/CommandsJDA.git'
 
         version {
-            name = '0.1-SNAPSHOT'
+            name = project.version
             desc = 'Pre-release CommandsJDA'
             released = new Date()
-            vcsTag = '0.1-SNAPSHOT'
+            vcsTag = project.version
         }
     }
     configurations = ['archives']
+    publish = true
+}
+
+
+task createPOM {
+    pom {
+        project {
+            packaging 'aar'
+            groupId project.group
+            artifactId 'CommandsJDA'
+            version project.version
+            name 'CommandsJDA'
+            inceptionYear '2020'
+            licenses {
+                license {
+                    name 'MIT'
+                    url 'https://opensource.org/licenses/MIT'
+                    distribution 'repo'
+                }
+            }
+            developers {
+                developer {
+                    name 'Samantha Blackrose'
+                    roles {
+                        role 'Lead Developer'
+                    }
+                }
+            }
+            scm {
+                connection 'https://github.com/x-Samantha/CommandsJDA.git'
+                developerConnection 'https://github.com/x-Samantha/CommandsJDA.git'
+            }
+        }
+    }.writeTo("pom.xml")
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier.set('sources')
+    from sourceSets.main.allSource
+}
+
+javadoc.failOnError = false
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set('javadoc')
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+build {
+    dependsOn('createPOM', 'bintrayUpload')
 }
